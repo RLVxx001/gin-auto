@@ -1,8 +1,11 @@
+/*
+Copyright © 2025 NAME HERE <EMAIL ADDRESS>
+
+*/
 package main
 
-import "gin-auto/auto"
+import "gin-auto/cmd"
 
 func main() {
-	auto.GetApi()
-	auto.A.InsertContext()
+	cmd.Execute()
 }

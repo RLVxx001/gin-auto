@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
@@ -35,9 +37,9 @@ func NewAutoApi() *AutoApi {
 }
 func (a *AutoApi) mkdirAll() {
 	os.MkdirAll(co.AppUrl, os.ModePerm)
-	os.MkdirAll(co.AppUrl+`/`+co.ControllerPackageName, os.ModePerm)
-	os.MkdirAll(co.AppUrl+`/`+co.ServicePackageName, os.ModePerm)
-	os.MkdirAll(co.AppUrl+`/`+co.DaoPackageName, os.ModePerm)
+	os.MkdirAll(filepath.Join(co.AppUrl, co.ControllerPackageName), os.ModePerm)
+	os.MkdirAll(filepath.Join(co.AppUrl, co.ServicePackageName), os.ModePerm)
+	os.MkdirAll(filepath.Join(co.AppUrl, co.DaoPackageName), os.ModePerm)
 }
 
 // 父类主文件初始化检查
@@ -259,6 +261,13 @@ func (a *AutoApi) toControllerString() string {
 	return builder.String()
 }
 
+func parseFlags() {
+	var outputDir string
+	flag.StringVar(&outputDir, "output", ".", "指定输出目录")
+	flag.Parse()
+	initPaths(outputDir)
+}
+
 type AutoApiCommon struct {
 	Tags      string //标签
 	Version   string //版本
@@ -286,6 +295,7 @@ type ControllerTemplateSwagger struct {
 	RequestType string //请求类型[get|post]
 }
 type common struct {
+	BaseDir                           string // 基础模板目录配置
 	AddClassSub                       string
 	Name                              string
 	SuccLogo                          string //成功
@@ -317,6 +327,35 @@ type common struct {
 	ParentService_no_resp_templateUrl string
 	AppPackagePre                     string
 	Form_apiUrl                       string
+}
+
+func initPaths(baseDir string) {
+	// 使用filepath.Join处理路径分隔符
+	co.BaseDir = baseDir
+	co.AppUrl = filepath.Join(co.BaseDir, "app")
+	co.ApiUrl = filepath.Join(co.AppUrl, "api.go")
+	co.ControllerPackageName = filepath.Join("app", "controller")
+	co.ServicePackageName = filepath.Join("app", "service")
+	co.DaoPackageName = filepath.Join("app", "dao")
+	co.ControllerUrl = filepath.Join(co.AppUrl, co.ControllerPackageName, "controller.go")
+	co.Controller_templateUrl = filepath.Join(co.BaseDir, "controller_template.txt")
+	co.Controller_init_templateUrl = filepath.Join(co.BaseDir, "controller_init_template.txt")
+	co.ServiceUrl = filepath.Join(co.AppUrl, co.ServicePackageName, "service.go")
+	co.Service_no_resp_templateUrl = filepath.Join(co.BaseDir, "service_no_resp_template.txt")
+	co.Service_resp_templateUrl = filepath.Join(co.BaseDir, "service_resp_template.txt")
+	co.Service_init_templateUrl = filepath.Join(co.BaseDir, "service_init_template.txt")
+	co.DaoUrl = filepath.Join(co.AppUrl, co.DaoPackageName, "dao.go")
+	co.Dao_init_templateUrl = filepath.Join(co.BaseDir, "dao_init_template.txt")
+	co.ParentDaoUrl = filepath.Join(co.AppUrl, co.DaoPackageName, "parent_dao.go")
+	co.ParentDao_init_templateUrl = filepath.Join(co.BaseDir, "parent_dao_init_template.txt")
+	co.ParentControllerUrl = filepath.Join(co.AppUrl, co.ControllerPackageName, "parent_controller.go")
+	co.ParentController_init_templateUrl = filepath.Join(co.BaseDir, "parent_controller_init_template.txt")
+	co.ParentServiceUrl = filepath.Join(co.AppUrl, co.ServicePackageName, "parent_service.go")
+	co.ParentService_init_templateUrl = filepath.Join(co.BaseDir, "parent_service_init_template.txt")
+	co.ParentService_resp_templateUrl = filepath.Join(co.BaseDir, "parent_service_resp_template.txt")
+	co.ParentService_no_resp_templateUrl = filepath.Join(co.BaseDir, "parent_service_no_resp_template.txt")
+	co.Api_sub_templateUrl = filepath.Join(co.BaseDir, "api_sub_template.txt")
+	co.Api_init_templateUrl = filepath.Join(co.BaseDir, "api_init_template.txt")
 }
 
 var co = common{}
@@ -366,6 +405,7 @@ func (c *ControllerTemplate) toString() string {
 var replace *Replace
 
 func init() {
+	parseFlags() // 在初始化时解析参数
 	replace = NewReplace()
 	replace.WriteFile("gin_auto_public_info.application")
 	s, err := open("gin_auto_setting_info.application")
