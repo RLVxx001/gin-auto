@@ -1,0 +1,22 @@
+package {{daoPackageName}}
+
+import (
+	"gorm.io/gorm"
+)
+
+type DAO struct {
+	db *gorm.DB
+}
+
+func (d *DAO) GetDb() *gorm.DB {
+	return d.db
+}
+
+func New(db *gorm.DB) *DAO {
+	return &DAO{
+		db: db,
+	}
+}
+func InitTable() error {
+    return nil
+}

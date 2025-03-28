@@ -1,0 +1,5 @@
+package {{servicePackageName}}
+
+import (
+	"{{appPackagePre}}/{{name}}/{{daoPackageName}}"
+)
