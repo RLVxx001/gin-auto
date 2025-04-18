@@ -1,6 +1,0 @@
-// {{summary}}
-func (p *Proxy) {{funcName}}(req *{{daoPackageName}}.{{reqName}}) (*{{daoPackageName}}.{{respName}}, error) {
-	resp := &{{daoPackageName}}.{{respName}}{}
-	return resp, nil
-}
-

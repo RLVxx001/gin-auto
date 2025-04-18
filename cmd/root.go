@@ -1,34 +1,81 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
 	"os"
 
+	"gin-auto/auto"
+
 	"github.com/spf13/cobra"
 )
 
-
-
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "gin-auto",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "自动化gin框架代码生成工具",
+	Long: `自动化gin框架代码生成工具
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+使用方式：
+  gin-auto -i <输入目录> -o <输出目录> [-t <模板目录>] [-s <配置文件路径>]
+
+参数说明：
+  -i, --input string   指定API文件目录路径（必填）
+  -o, --output string  指定输出目录路径（必填）
+  -s, --setting string 指定配置文件路径（可选，默认为当前目录下的.setting）
+  -t, --template string 指定模板目录路径（可选，默认为当前目录下的.templates）
+
+示例：
+  gin-auto -i ./input -o ./output
+  gin-auto -i ./input -o ./output -t ./my-templates`,
+
+	Run: func(cmd *cobra.Command, args []string) {
+		inputDir, err := cmd.Flags().GetString("input")
+		if err != nil {
+			cmd.PrintErrf("获取输入目录失败: %v\n", err)
+			return
+		}
+
+		outputDir, err := cmd.Flags().GetString("output")
+		if err != nil {
+			cmd.PrintErrf("获取输出目录失败: %v\n", err)
+			return
+		}
+
+		templateDir, err := cmd.Flags().GetString("template")
+		if err != nil {
+			cmd.PrintErrf("获取模板目录失败: %v\n", err)
+			return
+		}
+
+		settingFile, err := cmd.Flags().GetString("setting")
+		if err != nil {
+			cmd.PrintErrf("获取配置文件路径失败: %v\n", err)
+			return
+		}
+
+		// 必填参数没有填，弹帮助
+		if inputDir == "" || outputDir == "" {
+			cmd.Help()
+			return
+		}
+
+		// 如果未指定模板目录，使用默认值
+		if templateDir == "" {
+			templateDir = ".templates"
+		}
+
+		// 初始化auto包
+		auto.Initialize(settingFile)
+
+		// 初始化目标输出目录
+		auto.InitWorkDir(outputDir)
+
+		// 初始化模板目录
+		auto.InitTemplateDir(templateDir)
+
+		auto.GetApi()
+		auto.A.InsertContext()
+	},
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
@@ -37,15 +84,10 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gin-auto.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().StringP("input", "i", "", "输入目录（必填）")
+	rootCmd.Flags().StringP("output", "o", "", "输出目录（必填）")
+	rootCmd.Flags().StringP("template", "t", "", "模板目录（可选，默认为.templates）")
+	rootCmd.Flags().StringP("setting", "s", "", "配置文件路径（可选，默认为当前目录下的.setting）")
+	rootCmd.MarkFlagRequired("input")
+	rootCmd.MarkFlagRequired("output")
 }
-
-
