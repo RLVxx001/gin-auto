@@ -1,8 +1,9 @@
 package main
 
 import (
-	"gin-auto/auto"
 	"testing"
+
+	"github.com/n8sPxD/gin-auto/auto"
 )
 
 func TestMain(t *testing.T) {

@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"gin-auto/auto"
+	"github.com/n8sPxD/gin-auto/auto"
 
 	"github.com/spf13/cobra"
 )
