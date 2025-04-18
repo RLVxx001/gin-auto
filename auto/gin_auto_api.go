@@ -425,8 +425,8 @@ func Initialize(prefixURL string) {
 var A *AutoApi
 
 // 从api文件中抓取api内容
-func GetApi() {
-	s, err := open(replace.GetValue("Form_apiUrl"))
+func GetApi(apiURL string) {
+	s, err := open(apiURL)
 	if err != nil {
 		panic(err)
 	}

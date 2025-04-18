@@ -71,7 +71,7 @@ var rootCmd = &cobra.Command{
 		// 初始化模板目录
 		auto.InitTemplateDir(templateDir)
 
-		auto.GetApi()
+		auto.GetApi(inputDir)
 		auto.A.InsertContext()
 	},
 }
