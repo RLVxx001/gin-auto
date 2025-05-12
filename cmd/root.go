@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/n8sPxD/gin-auto/auto"
+	"github.com/RLVxx001/gin-auto/auto"
 
 	"github.com/spf13/cobra"
 )
@@ -19,8 +19,8 @@ var rootCmd = &cobra.Command{
 参数说明：
   -i, --input string   指定API文件目录路径（必填）
   -o, --output string  指定输出目录路径（必填）
-  -s, --setting string 指定配置文件路径（可选，默认为当前目录下的.setting）
-  -t, --template string 指定模板目录路径（可选，默认为当前目录下的.templates）
+  -s, --settings string 指定配置文件路径（可选，默认为当前目录下的.settings）
+  -t, --templates string 指定模板目录路径（可选，默认为当前目录下的.templates）
 
 示例：
   gin-auto -i ./input -o ./output
@@ -39,13 +39,13 @@ var rootCmd = &cobra.Command{
 			return
 		}
 
-		templateDir, err := cmd.Flags().GetString("template")
+		templateDir, err := cmd.Flags().GetString("templates")
 		if err != nil {
 			cmd.PrintErrf("获取模板目录失败: %v\n", err)
 			return
 		}
 
-		settingFile, err := cmd.Flags().GetString("setting")
+		settingFile, err := cmd.Flags().GetString("settings")
 		if err != nil {
 			cmd.PrintErrf("获取配置文件路径失败: %v\n", err)
 			return
@@ -56,12 +56,34 @@ var rootCmd = &cobra.Command{
 			cmd.Help()
 			return
 		}
-
+		// 如果未指定配置文件路径，使用默认值
+		if settingFile == "" {
+			settingFile = ".settings"
+		}
 		// 如果未指定模板目录，使用默认值
 		if templateDir == "" {
 			templateDir = ".templates"
 		}
-
+		{
+			//检查是否存在配置文件以及模板文件
+			_, err := os.Stat(settingFile)
+			if err != nil {
+				err = createInitSettingsFile(settingFile, false)
+				if err != nil {
+					cmd.PrintErrf("创建配置文件失败: %v\n", err)
+					return
+				}
+			}
+			//  检查模板目录
+			_, err = os.Stat(templateDir)
+			if err != nil {
+				err = createInitTemplateFile(templateDir, false)
+				if err != nil {
+					cmd.PrintErrf("创建模板目录失败: %v\n", err)
+					return
+				}
+			}
+		}
 		// 初始化auto包
 		auto.Initialize(settingFile)
 
@@ -86,8 +108,8 @@ func Execute() {
 func init() {
 	rootCmd.Flags().StringP("input", "i", "", "输入目录（必填）")
 	rootCmd.Flags().StringP("output", "o", "", "输出目录（必填）")
-	rootCmd.Flags().StringP("template", "t", "", "模板目录（可选，默认为.templates）")
-	rootCmd.Flags().StringP("setting", "s", "", "配置文件路径（可选，默认为当前目录下的.setting）")
+	rootCmd.Flags().StringP("templates", "t", "", "模板目录（可选，默认为.templates）")
+	rootCmd.Flags().StringP("settings", "s", "", "配置文件路径（可选，默认为当前目录下的.settings）")
 	rootCmd.MarkFlagRequired("input")
 	rootCmd.MarkFlagRequired("output")
 }

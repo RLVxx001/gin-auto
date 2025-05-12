@@ -1,0 +1,9 @@
+package {{controllerPackageName}}
+
+import (
+	"net/http"
+
+	"{{appPackagePre}}/{{name}}/{{daoPackageName}}"
+	"github.com/gin-gonic/gin"
+)
+

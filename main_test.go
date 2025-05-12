@@ -3,10 +3,10 @@ package main
 import (
 	"testing"
 
-	"github.com/n8sPxD/gin-auto/auto"
+	"github.com/RLVxx001/gin-auto/auto"
 )
 
-func TestMain(t *testing.T) {
+func TestMain(m *testing.M) {
 	a := auto.NewAutoApi()
 	a.AutoApiCommon = auto.AutoApiCommon{
 		Tags:      "测试tags",

@@ -1,0 +1,13 @@
+name=test
+subName=template
+app=../app
+api=../api
+appPackagePre=gin-auto/app
+ParentServiceLogo=type Services interface
+SuccLogo=succ
+daoPackageName=dao
+servicePackageName=service
+controllerPackageName=controller
+initUser=
+addClassSub=
+form_api_url=api/group.api

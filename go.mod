@@ -1,4 +1,4 @@
-module github.com/n8sPxD/gin-auto
+module github.com/RLVxx001/gin-auto
 
 go 1.23.3
 

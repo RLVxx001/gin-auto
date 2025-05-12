@@ -1,0 +1,5 @@
+// {{summary}}
+func (p *Proxy) {{funcName}}(req *{{daoPackageName}}.{{reqName}}) error {
+	return nil
+}
+
