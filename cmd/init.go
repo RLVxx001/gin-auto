@@ -112,7 +112,7 @@ var defaultTemplateDict = map[string][]byte{}
 //go:embed .settings/*
 var defaultSettingFS embed.FS
 
-//go:embed .template/*
+//go:embed .templates/*
 var defaultTemplateFS embed.FS
 
 // 初始化默认配置和模板
@@ -122,7 +122,7 @@ func initDefaultSettingAndTemplate() {
 	if err != nil {
 		panic("获取默认配置失败：" + err.Error())
 	}
-	defaultTemplateDict, err = getDirToMap(&defaultTemplateFS, ".template")
+	defaultTemplateDict, err = getDirToMap(&defaultTemplateFS, ".templates")
 	if err != nil {
 		panic("获取默认模板失败：" + err.Error())
 	}

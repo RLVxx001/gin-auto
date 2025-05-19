@@ -1,0 +1,94 @@
+//_file_addr表示文件地址
+//package_addr表示引用的包地址
+//templates_file_addr表示模板文件地址（外部提供）
+
+//project 该项目
+project_dir_file_addr=   //（不填的话会向上找go.mod文件所在位置得到此文件地址）
+project_dir_package_addr= //（不填的话会向上找go.mod文件中找到该信息）
+
+//module 模块
+module_name=test
+
+//sub_module 子模块（一般在.api文件中提到）
+//sub_module_name=
+
+//api_dir
+api_dir_name=api
+api_dir_file_addr={{project_dir_file_addr}}/api
+api_dir_package_addr={{project_dir_package_addr}}/api
+
+//api_module
+api_module_name={{module_name}}
+api_module_file_addr={{api_dir_file_addr}}/{{api_module_name}}.go
+
+//api_module_template（模板）
+api_module_template_init_file_addr={{templates_file_addr}}/api_module_template_init //初始化模板
+api_module_template_add_file_addr={{templates_file_addr}}/api_module_template_add //新增模板
+
+//app_dir
+app_dir_name=app
+app_dir_file_addr={{project_dir_file_addr}}/app
+app_dir_package_addr={{project_dir_package_addr}}/app
+
+//controller_dir
+controller_dir_name=controller
+controller_dir_file_addr={{app_dir_file_addr}}/{{module_name}}/{{controller_dir_name}}
+controller_dir_package_addr={{app_dir_package_addr}}/{{module_name}}/{{controller_dir_name}}
+
+//controller_subject
+controller_subject_name=controller
+controller_subject_file_addr={{controller_dir_file_addr}}/{{controller_subject_name}}.go
+
+//controller_subject_template（模板）
+controller_subject_template_init_file_addr={{templates_file_addr}}/controller_subject_template_init //初始化模板
+controller_subject_template_add_file_addr={{templates_file_addr}}/controller_subject_template_add //新增模板
+
+//controller_sub_module
+controller_sub_module_name={{sub_module_name}}
+controller_sub_module_file_addr={{controller_dir_file_addr}}/{{controller_sub_module_name}}.go
+
+//controller_sub_module_template（模板）
+controller_sub_module_template_init_file_addr={{templates_file_addr}}/controller_sub_module_template_init //初始化模板
+controller_sub_module_template_add_file_addr={{templates_file_addr}}/controller_sub_module_template_add //新增模板
+
+//service_dir
+service_dir_name=service
+service_dir_file_addr={{app_dir_file_addr}}/{{module_name}}/{{service_dir_name}}
+service_dir_package_addr={{app_dir_package_addr}}/{{module_name}}/{{service_dir_name}}
+
+//service_subject
+service_subject_name=service
+service_subject_file_addr={{service_dir_file_addr}}/{{service_subject_name}}.go
+
+//service_subject_template（模板）
+service_subject_template_init_file_addr={{templates_file_addr}}/service_subject_template_init //初始化模板
+service_subject_template_add_file_addr={{templates_file_addr}}/service_subject_template_add //新增模板
+
+//service_sub_module
+service_sub_module_name={{sub_module_name}}
+service_sub_module_file_addr={{service_dir_file_addr}}/{{service_sub_module_name}}.go
+
+//service_sub_module_template（模板）
+service_sub_module_template_init_file_addr={{templates_file_addr}}/service_sub_module_template_init //初始化模板
+service_sub_module_template_add_file_addr={{templates_file_addr}}/service_sub_module_template_add //新增模板
+
+//dao_dir
+dao_dir_name=dao
+dao_dir_file_addr={{app_dir_file_addr}}/{{module_name}}/{{dao_dir_name}}
+dao_dir_package_addr={{app_dir_package_addr}}/{{module_name}}/{{dao_dir_name}}
+
+//dao_subject
+dao_subject_name=dao
+dao_subject_file_addr={{dao_dir_file_addr}}/{{dao_subject_name}}.go
+
+//dao_subject_template（模板）
+dao_subject_template_init_file_addr={{templates_file_addr}}/dao_subject_template_init //初始化模板
+dao_subject_template_add_file_addr={{templates_file_addr}}/dao_subject_template_add //新增模板
+
+//dao_sub_module
+dao_sub_module_name=type_{{sub_module_name}}
+dao_sub_module_file_addr={{dao_dir_file_addr}}/{{dao_sub_module_name}}.go
+
+//dao_sub_module_template（模板）
+dao_sub_module_template_init_file_addr={{templates_file_addr}}/dao_sub_module_template_init //初始化模板
+dao_sub_module_template_add_file_addr={{templates_file_addr}}/dao_sub_module_template_add //新增模板

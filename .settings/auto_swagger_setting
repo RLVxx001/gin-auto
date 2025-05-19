@@ -1,0 +1,4 @@
+controller_logo=func (h *Handler)
+handler_logo=handler.
+success_logo="succ"
+ctx_json_logo=ctx.JSON

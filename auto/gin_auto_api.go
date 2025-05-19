@@ -11,9 +11,6 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
-
 	"github.com/jinzhu/copier"
 )
 
@@ -36,69 +33,43 @@ func NewAutoApi() *AutoApi {
 }
 
 func (a *AutoApi) mkdirAll() {
-	os.MkdirAll(co.AppUrl, os.ModePerm)
-	os.MkdirAll(filepath.Join(co.AppUrl, co.ControllerPackageName), os.ModePerm)
-	os.MkdirAll(filepath.Join(co.AppUrl, co.ServicePackageName), os.ModePerm)
-	os.MkdirAll(filepath.Join(co.AppUrl, co.DaoPackageName), os.ModePerm)
+	os.MkdirAll(co.ApiDirFileAddr, os.ModePerm)
+	os.MkdirAll(co.AppDirFileAddr, os.ModePerm)
+	os.MkdirAll(co.ControllerDirFileAddr, os.ModePerm)
+	os.MkdirAll(co.ServiceDirFileAddr, os.ModePerm)
+	os.MkdirAll(co.DaoDirFileAddr, os.ModePerm)
 }
 
-// 父类主文件初始化检查
-func (a *AutoApi) parentInit() {
-	a.mkdirAll()
-	//api文件查看是否存在
-	_, err := open(co.ApiUrl)
-	if err != nil {
-		s, _ := open(co.Api_init_templateUrl)
-		write(co.ApiUrl, replace.SubReplaceAll(s, map[string]string{
-			"name": cases.Title(language.English).String(replace.GetValue("name")),
-		}))
-	}
-
-	//主dao文件是否存在
-	_, err = open(co.ParentDaoUrl)
-	if err != nil {
-		s, _ := open(co.ParentDao_init_templateUrl)
-		write(co.ParentDaoUrl, replace.ReplaceAll(s))
-	}
-	//主controller文件是否存在
-	_, err = open(co.ParentControllerUrl)
-	if err != nil {
-		s, _ := open(co.ParentController_init_templateUrl)
-		write(co.ParentControllerUrl, replace.ReplaceAll(s))
-	}
-	//主service文件是否存在
-	_, err = open(co.ParentServiceUrl)
-	if err != nil {
-		s, _ := open(co.ParentService_init_templateUrl)
-		write(co.ParentServiceUrl, replace.ReplaceAll(s))
+// checkStatIfNotExistsCreateTemplate 检查文件是否存在不存在即创建模板
+func checkStatIfNotExistsCreateTemplate(fileAddr string, templateAddr string) {
+	if !stat(fileAddr) {
+		s, _ := open(templateAddr)
+		//把替换后的内容写入文件
+		write(fileAddr, replace.ReplaceAll(s))
 	}
 }
+
+// init 初始化（包含创建初始化模板）
 func (a *AutoApi) init() {
-	//controller文件查看是否存在
-	_, err := open(co.ControllerUrl)
-	if err != nil {
-		s, _ := open(co.Controller_init_templateUrl)
-		write(co.ControllerUrl, replace.ReplaceAll(s))
-	}
-	//dao文件是否存在
-	_, err = open(co.DaoUrl)
-	if err != nil {
-		s, _ := open(co.Dao_init_templateUrl)
-		write(co.DaoUrl, replace.ReplaceAll(s))
-	}
-	//service文件是否存在
-	_, err = open(co.ServiceUrl)
-	if err != nil {
-		s, _ := open(co.Service_init_templateUrl)
-		write(co.ServiceUrl, replace.ReplaceAll(s))
-	}
+	a.mkdirAll()
+	//api
+	checkStatIfNotExistsCreateTemplate(co.ApiModuleFileAddr, co.ApiModuleTemplateInitFileAddr)
+	//controller
+	checkStatIfNotExistsCreateTemplate(co.ControllerSubjectFileAddr, co.ControllerSubjectTemplateInitFileAddr)
+	checkStatIfNotExistsCreateTemplate(co.ControllerSubModuleFileAddr, co.ControllerSubModuleTemplateInitFileAddr)
+	//service
+	checkStatIfNotExistsCreateTemplate(co.ServiceSubjectFileAddr, co.ServiceSubjectTemplateInitFileAddr)
+	checkStatIfNotExistsCreateTemplate(co.ServiceSubModuleFileAddr, co.ServiceSubModuleTemplateInitFileAddr)
+	//dao
+	checkStatIfNotExistsCreateTemplate(co.DaoSubjectFileAddr, co.DaoSubjectTemplateInitFileAddr)
+	checkStatIfNotExistsCreateTemplate(co.DaoSubModuleFileAddr, co.DaoSubModuleTemplateInitFileAddr)
 }
 
 // 去重
 func (a *AutoApi) removeRepetition() {
 
-	//controller类去重
-	s, _ := open(co.ControllerUrl)
+	//controller去重
+	s, _ := open(co.ControllerSubModuleFileAddr)
 	ControllerTemplates := make([]*ControllerTemplate, 0)
 	for _, item := range a.ControllerTemplates {
 		if !strings.Contains(s, item.FuncName) {
@@ -108,7 +79,7 @@ func (a *AutoApi) removeRepetition() {
 	a.ControllerTemplates = ControllerTemplates
 
 	//dao类去重
-	s, _ = open(co.DaoUrl)
+	s, _ = open(co.DaoSubModuleFileAddr)
 	classes := make([]*AutoApiClass, 0)
 	for _, item := range a.Classs {
 		if !strings.Contains(s, item.Name) {
@@ -120,11 +91,10 @@ func (a *AutoApi) removeRepetition() {
 
 // 插入内容
 func (a *AutoApi) InsertContext() {
-	a.parentInit()
 	a.init()
 	a.removeRepetition()
-	a.insertControllerContext()
 
+	a.insertControllerContext()
 	a.insertApiContext()
 	a.insertDaoContext()
 	a.insertServiceContext()
@@ -133,12 +103,13 @@ func (a *AutoApi) InsertContext() {
 // 插入service内容
 func (a *AutoApi) insertServiceContext() {
 	toString := a.toServiceString()
-	s, _ := open(co.ServiceUrl)
+	s, _ := open(co.ServiceSubModuleFileAddr)
 	s = strings.TrimSpace(s) + "\n\n" + toString
-	write(co.ServiceUrl, s)
-	fmt.Println(co.ServiceUrl)
+	write(co.ServiceSubModuleFileAddr, s)
+	fmt.Println(co.ServiceSubModuleFileAddr)
+
 	//插入parentService内容
-	s, _ = open(co.ParentServiceUrl)
+	s, _ = open(co.ServiceSubjectFileAddr)
 	index := strings.Index(s, co.ParentServiceLogo)
 	if index == -1 {
 		panic("parentService文件异常")
@@ -153,22 +124,12 @@ func (a *AutoApi) insertServiceContext() {
 
 // parentService内容
 func (a *AutoApi) toParentServiceString() string {
-	noResp, err := open(co.ParentService_no_resp_templateUrl)
-	if err != nil {
-		panic(err)
-	}
-	resp, err := open(co.ParentService_resp_templateUrl)
+	s, err := open(co.ServiceSubjectTemplateAddFileAddr)
 	if err != nil {
 		panic(err)
 	}
 	builder := strings.Builder{}
 	for _, item := range a.ControllerTemplates {
-		var s string
-		if item.RespDetail == "err" {
-			s = noResp
-		} else {
-			s = resp
-		}
 		builder.WriteString("\t")
 		builder.WriteString(replace.SubReplaceAll(s, item))
 		builder.WriteString("\n")
@@ -178,22 +139,12 @@ func (a *AutoApi) toParentServiceString() string {
 
 // service内容
 func (a *AutoApi) toServiceString() string {
-	noResp, err := open(co.Service_no_resp_templateUrl)
+	s, err := open(co.ServiceSubModuleTemplateAddFileAddr)
 	if err != nil {
-		panic(err)
-	}
-	resp, err := open(co.Service_resp_templateUrl)
-	if err != nil {
-		panic(err)
+		panic("service内容:" + err.Error())
 	}
 	builder := strings.Builder{}
 	for _, item := range a.ControllerTemplates {
-		var s string
-		if item.RespDetail == "err" {
-			s = noResp
-		} else {
-			s = resp
-		}
 		builder.WriteString(replace.SubReplaceAll(s, item))
 		builder.WriteString("\n\n")
 	}
@@ -203,10 +154,10 @@ func (a *AutoApi) toServiceString() string {
 // 插入dao内容
 func (a *AutoApi) insertDaoContext() {
 	toString := a.toDaoString()
-	s, _ := open(co.DaoUrl)
+	s, _ := open(co.DaoSubModuleFileAddr)
 	s = strings.TrimSpace(s) + "\n\n" + toString
-	write(co.DaoUrl, s)
-	fmt.Println(co.DaoUrl)
+	write(co.DaoSubModuleFileAddr, s)
+	fmt.Println(co.DaoSubModuleFileAddr)
 }
 
 // dao内容
@@ -221,23 +172,23 @@ func (a *AutoApi) toDaoString() string {
 // 插入api内容
 func (a *AutoApi) insertApiContext() {
 	toString := a.toApiString()
-	s, _ := open(co.ApiUrl)
+	s, _ := open(co.ApiModuleFileAddr)
 	index := strings.LastIndex(s, "}")
 	if index == -1 {
 		panic("api文件异常")
 	}
 	s = s[:index] + toString + s[index:]
-	write(co.ApiUrl, s)
-	fmt.Println(co.ApiUrl)
+	write(co.ApiModuleFileAddr, s)
+	fmt.Println(co.ApiModuleFileAddr)
 }
 
 // api内容
 func (a *AutoApi) toApiString() string {
 	builder := strings.Builder{}
-	s, _ := open(co.Api_sub_templateUrl)
+	s, _ := open(co.ApiModuleTemplateAddFileAddr)
 	for _, item := range a.ControllerTemplates {
 		st := "\t" + s + "\n"
-		builder.WriteString(replace.SubReplaceAll(st, item, map[string]string{"requestType": strings.ToUpper(item.RequestType)}))
+		builder.WriteString(replace.SubReplaceAll(st, item))
 	}
 	return builder.String()
 }
@@ -245,10 +196,10 @@ func (a *AutoApi) toApiString() string {
 // 插入controller内容
 func (a *AutoApi) insertControllerContext() {
 	toString := a.toControllerString()
-	s, _ := open(co.ControllerUrl)
+	s, _ := open(co.ControllerSubModuleFileAddr)
 	s = strings.TrimSpace(s) + "\n\n" + toString
-	write(co.ControllerUrl, s)
-	fmt.Println(co.ControllerUrl)
+	write(co.ControllerSubModuleFileAddr, s)
+	fmt.Println(co.ControllerSubModuleFileAddr)
 }
 
 // controller内容
@@ -292,72 +243,117 @@ type ControllerTemplateSwagger struct {
 }
 
 type Common struct {
-	WorkDir                           string // 工作目录，app目录下的pwd
-	TemplateDir                       string // 模板文件目录
-	AddClassSub                       string
-	Name                              string
-	SuccLogo                          string //成功
-	DaoPackageName                    string //dao包名称
-	ServicePackageName                string
-	ControllerPackageName             string
-	InitUserLogo                      string //初始化用户string
-	ParentServiceLogo                 string //type Services interface
-	AppUrl                            string //app包地址
-	ApiUrl                            string //api包地址
-	Api_sub_templateUrl               string
-	Api_init_templateUrl              string
-	ControllerUrl                     string //controller地址
-	Controller_templateUrl            string //controller模板地址
-	Controller_init_templateUrl       string
-	ServiceUrl                        string
-	Service_no_resp_templateUrl       string
-	Service_resp_templateUrl          string
-	Service_init_templateUrl          string
-	DaoUrl                            string
-	Dao_init_templateUrl              string
-	ParentDaoUrl                      string
-	ParentDao_init_templateUrl        string
-	ParentControllerUrl               string
-	ParentController_init_templateUrl string
-	ParentServiceUrl                  string
-	ParentService_init_templateUrl    string
-	ParentService_resp_templateUrl    string
-	ParentService_no_resp_templateUrl string
-	AppPackagePre                     string
-	Form_apiUrl                       string
+	WorkDir     string // 工作目录，app目录下的pwd
+	TemplateDir string // 模板文件目录
+
+	//project 该项目
+	ProjectDirFileAddr    string
+	ProjectDirPackageAddr string
+
+	//module 模块
+	ModuleName string
+	//sub_module 子模块（一般在.api文件中提到）
+	SubModuleName string
+
+	//api_dir
+	ApiDirName        string
+	ApiDirFileAddr    string
+	ApiDirPackageAddr string
+	//api_module
+	ApiModuleName     string
+	ApiModuleFileAddr string
+	//api_module_template（模板）
+	ApiModuleTemplateInitFileAddr string
+	ApiModuleTemplateAddFileAddr  string
+
+	//app_dir
+	AppDirName        string
+	AppDirFileAddr    string
+	AppDirPackageAddr string
+
+	//controller_dir
+	ControllerDirName        string
+	ControllerDirFileAddr    string
+	ControllerDirPackageAddr string
+	//controller_subject
+	ControllerSubjectName     string
+	ControllerSubjectFileAddr string
+	//controller_subject_template（模板）
+	ControllerSubjectTemplateInitFileAddr string
+	ControllerSubjectTemplateAddFileAddr  string
+	//controller_sub_module
+	ControllerSubModuleName     string
+	ControllerSubModuleFileAddr string
+	//controller_sub_module_template（模板）
+	ControllerSubModuleTemplateInitFileAddr string
+	ControllerSubModuleTemplateAddFileAddr  string
+
+	//service_dir
+	ServiceDirName        string
+	ServiceDirFileAddr    string
+	ServiceDirPackageAddr string
+	//service_subject
+	ServiceSubjectName     string
+	ServiceSubjectFileAddr string
+	//service_subject_template（模板）
+	ServiceSubjectTemplateInitFileAddr string
+	ServiceSubjectTemplateAddFileAddr  string
+	//service_sub_module
+	ServiceSubModuleName     string
+	ServiceSubModuleFileAddr string
+	//service_sub_module_template（模板）
+	ServiceSubModuleTemplateInitFileAddr string
+	ServiceSubModuleTemplateAddFileAddr  string
+
+	//dao_dir
+	DaoDirName        string
+	DaoDirFileAddr    string
+	DaoDirPackageAddr string
+	//dao_subject
+	DaoSubjectName     string
+	DaoSubjectFileAddr string
+	//dao_subject_template（模板）
+	DaoSubjectTemplateInitFileAddr string
+	DaoSubjectTemplateAddFileAddr  string
+	//dao_sub_module
+	DaoSubModuleName     string
+	DaoSubModuleFileAddr string
+	//dao_sub_module_template（模板）
+	DaoSubModuleTemplateInitFileAddr string
+	DaoSubModuleTemplateAddFileAddr  string
 }
 
 func InitTemplateDir(templateDir string) {
 	co.TemplateDir = templateDir
-	co.Controller_templateUrl = filepath.Join(co.TemplateDir, "controller_template")
-	co.Controller_init_templateUrl = filepath.Join(co.TemplateDir, "controller_init_template")
-	co.Service_no_resp_templateUrl = filepath.Join(co.TemplateDir, "service_no_resp_template")
-	co.Service_resp_templateUrl = filepath.Join(co.TemplateDir, "service_resp_template")
-	co.Service_init_templateUrl = filepath.Join(co.TemplateDir, "service_init_template")
-	co.Dao_init_templateUrl = filepath.Join(co.TemplateDir, "dao_init_template")
-	co.ParentDao_init_templateUrl = filepath.Join(co.TemplateDir, "parent_dao_init_template")
-	co.ParentController_init_templateUrl = filepath.Join(co.TemplateDir, "parent_controller_init_template")
-	co.ParentService_init_templateUrl = filepath.Join(co.TemplateDir, "parent_service_init_template")
-	co.ParentService_resp_templateUrl = filepath.Join(co.TemplateDir, "parent_service_resp_template")
-	co.ParentService_no_resp_templateUrl = filepath.Join(co.TemplateDir, "parent_service_no_resp_template")
-	co.Api_sub_templateUrl = filepath.Join(co.TemplateDir, "api_sub_template")
-	co.Api_init_templateUrl = filepath.Join(co.TemplateDir, "api_init_template")
+	//co.Controller_templateUrl = filepath.Join(co.TemplateDir, "controller_template")
+	//co.Controller_init_templateUrl = filepath.Join(co.TemplateDir, "controller_init_template")
+	//co.Service_no_resp_templateUrl = filepath.Join(co.TemplateDir, "service_no_resp_template")
+	//co.Service_resp_templateUrl = filepath.Join(co.TemplateDir, "service_resp_template")
+	//co.Service_init_templateUrl = filepath.Join(co.TemplateDir, "service_init_template")
+	//co.Dao_init_templateUrl = filepath.Join(co.TemplateDir, "dao_init_template")
+	//co.ParentDao_init_templateUrl = filepath.Join(co.TemplateDir, "parent_dao_init_template")
+	//co.ParentController_init_templateUrl = filepath.Join(co.TemplateDir, "parent_controller_init_template")
+	//co.ParentService_init_templateUrl = filepath.Join(co.TemplateDir, "parent_service_init_template")
+	//co.ParentService_resp_templateUrl = filepath.Join(co.TemplateDir, "parent_service_resp_template")
+	//co.ParentService_no_resp_templateUrl = filepath.Join(co.TemplateDir, "parent_service_no_resp_template")
+	//co.Api_sub_templateUrl = filepath.Join(co.TemplateDir, "api_sub_template")
+	//co.Api_init_templateUrl = filepath.Join(co.TemplateDir, "api_init_template")
 }
 
 func InitWorkDir(workDir string) {
 	// 使用filepath.Join处理路径分隔符
 	co.WorkDir = workDir
-	co.AppUrl = filepath.Join(co.WorkDir, "app")
-	co.ApiUrl = filepath.Join(co.AppUrl, "api.go")
-	co.ControllerPackageName = filepath.Join("app", "controller")
-	co.ServicePackageName = filepath.Join("app", "service")
-	co.DaoPackageName = filepath.Join("app", "dao")
-	co.ControllerUrl = filepath.Join(co.AppUrl, co.ControllerPackageName, "controller.go")
-	co.ServiceUrl = filepath.Join(co.AppUrl, co.ServicePackageName, "service.go")
-	co.DaoUrl = filepath.Join(co.AppUrl, co.DaoPackageName, "dao.go")
-	co.ParentDaoUrl = filepath.Join(co.AppUrl, co.DaoPackageName, "parent_dao.go")
-	co.ParentControllerUrl = filepath.Join(co.AppUrl, co.ControllerPackageName, "parent_controller.go")
-	co.ParentServiceUrl = filepath.Join(co.AppUrl, co.ServicePackageName, "parent_service.go")
+	//co.AppUrl = filepath.Join(co.WorkDir, "app")
+	//co.ApiUrl = filepath.Join(co.AppUrl, "api.go")
+	//co.ControllerPackageName = filepath.Join("app", "controller")
+	//co.ServicePackageName = filepath.Join("app", "service")
+	//co.DaoPackageName = filepath.Join("app", "dao")
+	//co.ControllerUrl = filepath.Join(co.AppUrl, co.ControllerPackageName, "controller.go")
+	//co.ServiceUrl = filepath.Join(co.AppUrl, co.ServicePackageName, "service.go")
+	//co.DaoUrl = filepath.Join(co.AppUrl, co.DaoPackageName, "dao.go")
+	//co.ParentDaoUrl = filepath.Join(co.AppUrl, co.DaoPackageName, "parent_dao.go")
+	//co.ParentControllerUrl = filepath.Join(co.AppUrl, co.ControllerPackageName, "parent_controller.go")
+	//co.ParentServiceUrl = filepath.Join(co.AppUrl, co.ServicePackageName, "parent_service.go")
 }
 
 var co = Common{}
@@ -388,6 +384,10 @@ func (c *ControllerTemplate) init() {
 		c.DaoRespName = co.DaoPackageName + "." + c.RespName
 	}
 }
+func stat(url string) bool {
+	_, err := os.Stat(url)
+	return err == nil
+}
 func open(url string) (string, error) {
 	bytes, err := os.ReadFile(url)
 	if err != nil {
@@ -403,7 +403,7 @@ func write(url string, data string) {
 	}
 }
 func (c *ControllerTemplate) toString() string {
-	template, _ := open(co.Controller_templateUrl)
+	template, _ := open(co.ControllerSubModuleTemplateAddFileAddr)
 	c.init()
 	return replace.SubReplaceAll(template, c)
 }
