@@ -1,9 +1,0 @@
-package {{controllerPackageName}}
-
-import (
-	"net/http"
-
-	"{{dao_package_url}}"
-	"github.com/gin-gonic/gin"
-)
-

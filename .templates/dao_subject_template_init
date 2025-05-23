@@ -1,4 +1,4 @@
-package {{daoPackageName}}
+package {{dao_dir_name}}
 
 import (
 	"gorm.io/gorm"

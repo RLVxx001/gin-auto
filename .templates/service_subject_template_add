@@ -1,0 +1,1 @@
+{{funcName}}(req *{{dao_dir_name}}.{{req_name}}) {{service_resp_type_context}}

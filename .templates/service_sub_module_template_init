@@ -1,0 +1,5 @@
+package {{service_dir_name}}
+
+import (
+	"{{dao_dir_package_addr}}"
+)

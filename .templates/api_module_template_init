@@ -1,0 +1,13 @@
+package api
+
+import (
+	"{{controller_dir_package_addr}}"
+	"{{service_dir_package_addr}}"
+	"github.com/gin-gonic/gin"
+)
+
+func register{{module_name_front_big}}(group *gin.RouterGroup) {
+	handler := {{controller_dir_name}}.NewHandler({{service_dir_name}}.NewServices())
+
+}
+

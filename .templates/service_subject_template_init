@@ -1,11 +1,11 @@
-package {{servicePackageName}}
+package {{service_dir_name}}
 
 import (
-	"{{dao_package_url}}"
+	"{{dao_dir_package_addr}}"
 )
 
 type Proxy struct {
-	dao        *{{daoPackageName}}.DAO
+	dao        *{{dao_dir_name}}.DAO
 }
 
 type Services interface {
@@ -15,7 +15,7 @@ type Services interface {
 // NewService ..
 func NewServices() Services {
 	p := &Proxy{
-		dao:        {{daoPackageName}}.New(sql.GetDB()),
+		dao:        {{dao_dir_name}}.New(sql.GetDB()),
 	}
 	return p
 }

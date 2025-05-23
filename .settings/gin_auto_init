@@ -1,5 +1,5 @@
 //_file_addr表示文件地址
-//package_addr表示引用的包地址
+//_package_addr表示引用的包地址
 //templates_file_addr表示模板文件地址（外部提供）
 
 //project 该项目
@@ -41,7 +41,7 @@ controller_subject_file_addr={{controller_dir_file_addr}}/{{controller_subject_n
 
 //controller_subject_template（模板）
 controller_subject_template_init_file_addr={{templates_file_addr}}/controller_subject_template_init //初始化模板
-controller_subject_template_add_file_addr={{templates_file_addr}}/controller_subject_template_add //新增模板
+//（在实现代码中没有用到）controller_subject_template_add_file_addr={{templates_file_addr}}/controller_subject_template_add //新增模板
 
 //controller_sub_module
 controller_sub_module_name={{sub_module_name}}
@@ -59,6 +59,7 @@ service_dir_package_addr={{app_dir_package_addr}}/{{module_name}}/{{service_dir_
 //service_subject
 service_subject_name=service
 service_subject_file_addr={{service_dir_file_addr}}/{{service_subject_name}}.go
+service_subject_logo=type Services interface
 
 //service_subject_template（模板）
 service_subject_template_init_file_addr={{templates_file_addr}}/service_subject_template_init //初始化模板
@@ -83,7 +84,7 @@ dao_subject_file_addr={{dao_dir_file_addr}}/{{dao_subject_name}}.go
 
 //dao_subject_template（模板）
 dao_subject_template_init_file_addr={{templates_file_addr}}/dao_subject_template_init //初始化模板
-dao_subject_template_add_file_addr={{templates_file_addr}}/dao_subject_template_add //新增模板
+//（在实现代码中没有用到）dao_subject_template_add_file_addr={{templates_file_addr}}/dao_subject_template_add //新增模板
 
 //dao_sub_module
 dao_sub_module_name=type_{{sub_module_name}}
@@ -91,4 +92,4 @@ dao_sub_module_file_addr={{dao_dir_file_addr}}/{{dao_sub_module_name}}.go
 
 //dao_sub_module_template（模板）
 dao_sub_module_template_init_file_addr={{templates_file_addr}}/dao_sub_module_template_init //初始化模板
-dao_sub_module_template_add_file_addr={{templates_file_addr}}/dao_sub_module_template_add //新增模板
+//（在实现代码中没有用到）dao_sub_module_template_add_file_addr={{templates_file_addr}}/dao_sub_module_template_add //新增模板

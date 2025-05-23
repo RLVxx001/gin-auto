@@ -84,16 +84,15 @@ var rootCmd = &cobra.Command{
 				}
 			}
 		}
-		// 初始化auto包
-		auto.Initialize(settingFile)
-
-		// 初始化目标输出目录
-		auto.InitWorkDir(outputDir)
-
-		// 初始化模板目录
-		auto.InitTemplateDir(templateDir)
-
+		// 1.初始化auto包
+		auto.Initialize(settingFile, templateDir)
+		// 2.setting_front（设置开头）
+		auto.RunSettingFront()
+		// 3.api_setting（api中用户端设置）
 		auto.GetApi(inputDir)
+		// 4.setting_back（设置结尾）
+		auto.RunSettingEnd()
+		// 5.api_list（api文件中各个接口信息）
 		auto.A.InsertContext()
 	},
 }

@@ -1,19 +1,6 @@
-name=test
-subName=template
-
-app_file_url=../app //app的文件地址
-app_package_url //app的包地址（包含formModule）
-api_file_url=../api //api的文件地址
-api_package_url //api的包地址（包含formModule）
-
-appPackagePre=gin-auto/app
-formModule=
-
-ParentServiceLogo=type Services interface
-SuccLogo=succ
-daoPackageName=dao
-servicePackageName=service
-controllerPackageName=controller
-initUser=
-addClassSub=
-form_api_url=api/group.api
+summary     string //描述
+func_name    string //方法名称
+request_type string //请求类型[get|post|put]
+url         string //地址
+req_name     string //请求参数名称
+resp_name    string //返回参数描述

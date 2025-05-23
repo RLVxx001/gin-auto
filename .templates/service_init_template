@@ -1,5 +1,0 @@
-package {{servicePackageName}}
-
-import (
-	"{{dao_package_url}}"
-)

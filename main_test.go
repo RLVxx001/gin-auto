@@ -37,7 +37,7 @@ func TestMain(m *testing.M) {
 			},
 		},
 	}
-	a.Classs = []*auto.AutoApiClass{
+	a.Classes = []*auto.AutoApiClass{
 		{
 			Context: "type TestReq struct{}",
 			Name:    "TestReq",

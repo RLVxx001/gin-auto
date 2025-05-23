@@ -1,0 +1,1 @@
+group.{{request_type_front_big}}("{{urlPre}}{{url}}", handler.{{func_name}})
