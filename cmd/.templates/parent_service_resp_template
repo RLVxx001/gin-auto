@@ -1,1 +1,0 @@
-{{funcName}}(req *{{daoPackageName}}.{{reqName}}) (*{{daoPackageName}}.{{respName}}, error)

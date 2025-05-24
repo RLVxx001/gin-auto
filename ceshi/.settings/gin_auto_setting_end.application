@@ -3,8 +3,8 @@
 //templates_file_addr表示模板文件地址（外部提供）
 
 //project 该项目
-//project_dir_file_addr=   //（不填的话会向上找go.mod文件所在位置得到此文件地址）
-//project_dir_package_addr= //（不填的话会向上找go.mod文件中找到该信息）
+project_dir_file_addr=   //（不填的话会向上找go.mod文件所在位置得到此文件地址）
+project_dir_package_addr= //（不填的话会向上找go.mod文件中找到该信息）
 
 //module 模块
 module_name=test

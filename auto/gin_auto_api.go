@@ -434,7 +434,7 @@ func write(url string, data string) {
 var replace *Replace
 
 func Initialize(settingsFileAddr, templatesFileAddr string) {
-	replace = NewReplace()
+	replace = NewReplace(WriteRelationModel(Number_1_RelationModel))
 	goModDir, err := findGoModDir()
 	if err == nil {
 		//初始化项目路径以及包路径
@@ -458,6 +458,39 @@ func Initialize(settingsFileAddr, templatesFileAddr string) {
 	replace.Copy(&co)
 
 	A = NewAutoApi()
+
+	HandlerAllRelation(settingsFileAddr)
+}
+
+// HandlerAllRelation 处理所有关系
+func HandlerAllRelation(settingsFileAddr string) {
+	// 打开目录
+	dir, err := os.Open(settingsFileAddr)
+	if err != nil {
+		fmt.Println("打开目录失败:", err)
+		return
+	}
+	defer dir.Close()
+
+	// 读取目录内容
+	files, err := dir.Readdir(-1)
+	if err != nil {
+		fmt.Println("读取目录失败:", err)
+		return
+	}
+
+	// 遍历目录中的文件和子目录
+	for _, file := range files {
+		if (!file.IsDir()) && strings.HasSuffix(file.Name(), "_relation") {
+			HandlerOneFileRelation(filepath.Join(settingsFileAddr, file.Name()))
+		}
+	}
+}
+
+// HandlerOneFileRelation 处理单个关系文件
+func HandlerOneFileRelation(addr string) {
+	replace.WriteFileRelation(addr)
+	fmt.Printf("关系文件%v已被读入\n", addr)
 }
 func RunSettingFront() {
 	runSetting(filepath.Join(co.SettingsFileAddr, "gin_auto_setting_front.application"))
@@ -583,6 +616,9 @@ func (r *Replace) Copy(v interface{}) {
 func (r *Replace) GetValue(k string) string {
 	return r.dict[r.serialization(k)]
 }
+func (r *Replace) setValue(k, v string) {
+	r.dict[r.serialization(k)] = v
+}
 
 // kv结构
 type ReplaceKV struct {
@@ -612,6 +648,13 @@ func (r *Replace) SubReplaceAll(s string, objs ...interface{}) string {
 
 // 替换全部
 func (r *Replace) ReplaceAll(s string) string {
+	cv := r.CV()
+	cv.EnableRelation()
+	return cv.replaceAll(s)
+}
+
+// 替换全部
+func (r *Replace) replaceAll(s string) string {
 	buffer := &bytes.Buffer{}
 	l := 0
 	for i := 0; i < len(s)-1; i++ {
@@ -629,7 +672,6 @@ func (r *Replace) ReplaceAll(s string) string {
 	buffer.WriteString(s[l:])
 	return buffer.String()
 }
-
 func NewReplaceKVByContext(st string) (*ReplaceKV, error) {
 	split := strings.Split(deleteComment(st), "=")
 	if split != nil && len(split) == 2 {
@@ -711,6 +753,11 @@ func NewReplace(opts ...ReplaceOpts) *Replace {
 	}
 	return r
 }
+func WriteRelationModel(relationModel RelationModel) ReplaceOpts {
+	return func(r *Replace) {
+		r.relationModel = relationModel
+	}
+}
 func (r *Replace) CV() *Replace {
 	re := &Replace{}
 	copier.Copy(re, r)
@@ -742,7 +789,7 @@ func (r *Replace) WriteInterface(obj interface{}) {
 }
 func (r *Replace) WriteReplaceKV(kvs ...*ReplaceKV) {
 	for _, kv := range kvs {
-		r.dict[r.serialization(kv.k)] = strings.TrimSpace(kv.v)
+		r.setValue(kv.k, r.replaceAll(strings.TrimSpace(kv.v)))
 	}
 }
 
@@ -753,6 +800,7 @@ func (r *Replace) WriteFileContextRelation(context string) {
 	vs2 := make([]*ReplaceKV, 0)
 	vsP := 0
 	for _, v := range split {
+		v = strings.TrimSpace(v)
 		if v == "IF" {
 			if len(vs1)+len(vs2) > 0 {
 				r.WriteReplaceKVRelation(vs1, vs2)
@@ -796,12 +844,12 @@ func (r *Replace) WriteReplaceKVRelation(old []*ReplaceKV, new []*ReplaceKV) {
 	for _, kv := range old {
 		kv.v = strings.TrimSpace(kv.v)
 		kv.k = r.serialization(kv.k)
-		fmt.Println(kv.k, kv.v)
+		//fmt.Println(kv.k, kv.v)
 	}
 	for _, kv := range new {
 		kv.v = strings.TrimSpace(kv.v)
 		kv.k = r.serialization(kv.k)
-		fmt.Println(kv.k, kv.v)
+		//fmt.Println(kv.k, kv.v)
 	}
 	relation := &ReplaceRelation{
 		old: old,
@@ -817,13 +865,13 @@ func (r *Replace) WriteReplaceKVRelation(old []*ReplaceKV, new []*ReplaceKV) {
 func (r *Replace) runRelation(relation *ReplaceRelation) {
 	// 判断关系条件是否满足
 	for _, kv := range relation.old {
-		if v, ok := r.dict[kv.k]; (!ok) || (ok && v != kv.v) {
+		if r.GetValue(kv.k) != r.replaceAll(kv.v) {
 			return
 		}
 	}
 	// 满足条件，替换关系
 	for _, kv := range relation.new {
-		r.dict[kv.k] = kv.v
+		r.setValue(kv.k, r.replaceAll(kv.v))
 	}
 }
 

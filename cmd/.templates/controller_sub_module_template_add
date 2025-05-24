@@ -1,0 +1,26 @@
+// {{func_name}}
+//
+//	@Tags		{{tags}}
+//	@Summary	{{summary}}
+//	@Description    {{description}}
+//	@Accept		application/json
+//	@Produce	json
+//	@Param		request	{{request_way}}		{{dao_dir_name}}.{{req_name}}		true	"请求体"
+//	@Success	200		{{{resp_type}}}	{{dao_resp_name}}	"{{resp_desc}}"
+//	@version	{{version}}
+//	@Router		{{urlPrePre}}{{urlPre}}{{url}} [{{request_type}}]
+func (h *Handler) {{func_name}}(ctx *gin.Context) {
+	var req {{dao_dir_name}}.{{req_name}}
+	if err := ctx.{{shouldBindType}}(&req); err != nil {
+		ctx.JSON(http.StatusOK, ret.ResultFail(ret.RespCodeBadParamValue))
+		return
+	}
+
+	{{resp_detail}} := h.Svc.{{func_name}}(&req)
+	if err != nil {
+		ctx.JSON(http.StatusOK, ret.Result(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, ret.Result({{resp_detail_result}}))
+}
+

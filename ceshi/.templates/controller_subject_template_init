@@ -1,0 +1,13 @@
+package {{controller_dir_name}}
+
+import "{{service_dir_package_addr}}"
+
+type Handler struct {
+	Svc {{service_dir_name}}.Services
+}
+
+func NewHandler(svc {{service_dir_name}}.Services) *Handler {
+	return &Handler{
+		Svc: svc,
+	}
+}

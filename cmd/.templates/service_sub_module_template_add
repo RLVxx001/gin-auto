@@ -1,0 +1,4 @@
+// {{funcName}} {{summary}}
+func (p *Proxy) {{funcName}}(req *{{dao_dir_name}}.{{req_name}}) {{service_resp_type_context}} {
+	return {{service_resp_detail_context}}
+}

@@ -1,0 +1,21 @@
+package {{service_dir_name}}
+
+import (
+	"{{dao_dir_package_addr}}"
+)
+
+type Proxy struct {
+	dao        *{{dao_dir_name}}.DAO
+}
+
+type Services interface {
+
+}
+
+// NewService ..
+func NewServices() Services {
+	p := &Proxy{
+		dao:        {{dao_dir_name}}.New(sql.GetDB()),
+	}
+	return p
+}

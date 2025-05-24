@@ -19,7 +19,7 @@ resp_desc=succ
 resp_detail=err
 resp_detail_result="succ"
 //service增量数据模板中使用
-service_resp_type_context=error
+service_resp_type_context=err
 service_resp_detail_context=nil
 
 //模块名称大写
@@ -32,22 +32,22 @@ module_name_front_big=Test
 IF
 request_type=get
 ->
-request_type_front_big=GET
+request_type_front_big=Get
 should_bind_type=ShouldBindQuery
 request_way=query
 
 IF
 request_type=post
 ->
-request_type_front_big=POST
-should_bind_type=ShouldBindJSON
+request_type_front_big=Post
+should_bind_type=ShouldBindJson
 request_way=body
 
 IF
 request_type=put
 ->
-request_type_front_big=PUT
-ShouldBindType=ShouldBindJSON
+request_type_front_big=Put
+ShouldBindType=ShouldBindJson
 request_way=body
 
 

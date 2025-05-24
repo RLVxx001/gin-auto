@@ -33,12 +33,6 @@ var rootCmd = &cobra.Command{
 			return
 		}
 
-		outputDir, err := cmd.Flags().GetString("output")
-		if err != nil {
-			cmd.PrintErrf("获取输出目录失败: %v\n", err)
-			return
-		}
-
 		templateDir, err := cmd.Flags().GetString("templates")
 		if err != nil {
 			cmd.PrintErrf("获取模板目录失败: %v\n", err)
@@ -52,7 +46,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		// 必填参数没有填，弹帮助
-		if inputDir == "" || outputDir == "" {
+		if inputDir == "" {
 			cmd.Help()
 			return
 		}
@@ -84,7 +78,7 @@ var rootCmd = &cobra.Command{
 				}
 			}
 		}
-		// 1.初始化auto包
+		// 1.初始化auto包（包含把setting文件夹下所有的以_relation结尾的关系文件导入）
 		auto.Initialize(settingFile, templateDir)
 		// 2.setting_front（设置开头）
 		auto.RunSettingFront()
@@ -110,5 +104,5 @@ func init() {
 	rootCmd.Flags().StringP("templates", "t", "", "模板目录（可选，默认为.templates）")
 	rootCmd.Flags().StringP("settings", "s", "", "配置文件路径（可选，默认为当前目录下的.settings）")
 	rootCmd.MarkFlagRequired("input")
-	rootCmd.MarkFlagRequired("output")
+	//rootCmd.MarkFlagRequired("output")
 }

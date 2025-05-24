@@ -1,0 +1,28 @@
+type (
+    EnableTemplateReq{
+        TemplateIds []int `json:"template_ids"` //模板id
+        IsEnable              bool  `json:"is_enable"`               //是否开启
+    }
+    CreateTemplateReq{
+        Name              string  `json:"name"`
+    }
+    CreateTemplateResp{
+        TemplateId int `json:"template_id"` //模板id
+    }
+)
+@server (
+    Tags: "测试1111"
+    Version: "1.0"
+    UrlPrePre: /admin/v10
+    UrlPre: /template
+    sub_module_name: test1
+)
+service {
+    @doc "是否开启"
+    @handler EnableTemplate
+    post /enable (EnableTemplateReq) returns ()
+
+    @doc "创建"
+    @handler CreateTemplate
+    get /create (CreateTemplateReq) returns (CreateTemplateResp)
+}
