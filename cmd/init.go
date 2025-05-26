@@ -44,7 +44,7 @@ var initCmd = &cobra.Command{
 			cmd.PrintErrf("创建初始化配置文件失败：%v\n", err)
 			return
 		}
-		err = createInitTemplateFile(filepath.Join(output, ".template"), cover)
+		err = createInitTemplateFile(filepath.Join(output, ".templates"), cover)
 		if err != nil {
 			cmd.PrintErrf("创建初始化模板文件失败：%v\n", err)
 			return
