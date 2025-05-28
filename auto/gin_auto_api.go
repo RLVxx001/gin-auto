@@ -73,7 +73,7 @@ func (a *AutoApi) removeRepetition() {
 	s, _ := open(co.ControllerSubModuleFileAddr)
 	subList := make([]*SubAutoApi, 0)
 	for _, item := range a.SubList {
-		if !strings.Contains(s, item.FuncName+"()") {
+		if !strings.Contains(s, item.FuncName+"(") {
 			subList = append(subList, item)
 		}
 	}
